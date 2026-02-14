@@ -17,9 +17,10 @@ exports.AuthService = {
         const user = await user_model_1.User.findOne({ email });
         if (!user)
             throw new Error("Invalid credentials");
+        if (!user.password) {
+            throw new Error("User password not found");
+        }
         const match = await bcryptjs_1.default.compare(password, user.password);
-        if (!match)
-            throw new Error("Invalid credentials");
         const accessToken = jsonwebtoken_1.default.sign({ id: user.id, role: user.role }, env_1.ENV.JWT_SECRET, { expiresIn: "15m" });
         const refreshToken = jsonwebtoken_1.default.sign({ id: user.id }, env_1.ENV.JWT_REFRESH_SECRET, { expiresIn: "7d" });
         user.refreshToken = refreshToken;

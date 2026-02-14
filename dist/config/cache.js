@@ -8,8 +8,13 @@ exports.redis = redis;
 let redisConnected = false;
 exports.redisConnected = redisConnected;
 let redisErrorLogged = false;
-// Attempt to connect to Redis, but don't block startup if it fails
+// Only initialize Redis if enabled
 const initializeRedis = async () => {
+    const redisEnabled = process.env.REDIS_ENABLED !== "false";
+    if (!redisEnabled) {
+        console.log("Redis disabled - using database only");
+        return;
+    }
     try {
         const client = (0, redis_1.createClient)({
             url: env_1.ENV.REDIS_URL,

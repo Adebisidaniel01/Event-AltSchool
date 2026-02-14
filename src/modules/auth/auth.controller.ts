@@ -1,17 +1,17 @@
-const jwt = require("jsonwebtoken");
-const { ENV } = require("../../config/env");
-const { AuthService } = require("./auth.service");
-const { User } = require("../users/user.model");
+import jwt from "jsonwebtoken";
+import { Request, Response } from "express";
+import { ENV } from "../../config/env";
+import { AuthService } from "./auth.service";
+import { User } from "../users/user.model";
 
-
-const AuthController = {
-  async register(req, res) {
+export const AuthController = {
+  async register(req: Request, res: Response) {
     const { email, password, role } = req.body;
     const user = await AuthService.register(email, password, role);
     res.status(201).json(user);
   },
 
-  async login(req, res) {
+  async login(req: Request, res: Response) {
     const tokens = await AuthService.login(
       req.body.email,
       req.body.password
@@ -19,7 +19,7 @@ const AuthController = {
     res.json(tokens);
   },
 
-  async refresh(req, res) {
+  async refresh(req: Request, res: Response) {
     const { refreshToken } = req.body;
 
     if (!refreshToken) {
@@ -29,7 +29,7 @@ const AuthController = {
     const payload = jwt.verify(
       refreshToken,
       ENV.JWT_REFRESH_SECRET
-    );
+    ) as any;
 
     const user = await User.findById(payload.id);
 
@@ -46,5 +46,3 @@ const AuthController = {
     res.json({ accessToken: newAccessToken });
   },
 };
-
-module.exports = { AuthController };

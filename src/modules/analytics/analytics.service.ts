@@ -1,28 +1,28 @@
-const { Event } = require("../events/event.model");
-const { Ticket } = require("../tickets/ticket.model");
+import { Event as EventModel } from "../events/event.model";
+import { Ticket } from "../tickets/ticket.model";
 
-const AnalyticsService = {
-  async byEvent(creatorId) {
-    const events = await Event.find({ creator: creatorId });
+export const AnalyticsService = {
+  async byEvent(creatorId: string) {
+    const events = await EventModel.find({ creator: creatorId });
 
-    const data = await Promise.all(
-      events.map(async (event) => {
-        const tickets = await Ticket.countDocuments({ event: event.id });
+    return Promise.all(
+      events.map(async (event: any) => {
+        const totalTickets = await Ticket.countDocuments({
+          event: event._id,
+        });
+
         const scanned = await Ticket.countDocuments({
-          event: event.id,
+          event: event._id,
           scanned: true,
         });
 
         return {
-          event: event.title,
-          tickets,
+          eventId: event._id,
+          eventTitle: event.title,
+          totalTickets,
           scanned,
         };
       })
     );
-
-    return data;
   },
 };
-
-module.exports = { AnalyticsService };

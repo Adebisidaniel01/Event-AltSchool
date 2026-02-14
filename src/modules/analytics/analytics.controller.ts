@@ -1,8 +1,9 @@
-const { Ticket } = require("../tickets/ticket.model");
-const { AnalyticsService } = require("./analytics.service");
+import { Request, Response } from "express";
+import { Ticket } from "../tickets/ticket.model";
+import { AnalyticsService } from "./analytics.service";
 
-const AnalyticsController = {
-  async overview(req, res) {
+export const AnalyticsController = {
+  async overview(req: Request, res: Response) {
     const totalTickets = await Ticket.countDocuments();
     const scanned = await Ticket.countDocuments({ scanned: true });
 
@@ -12,10 +13,8 @@ const AnalyticsController = {
     });
   },
 
-  async byEvent(req, res) {
-    const data = await AnalyticsService.byEvent(req.user.id);
+  async byEvent(req: Request, res: Response) {
+    const data = await AnalyticsService.byEvent((req as any).user.id);
     res.json(data);
   },
 };
-
-module.exports = { AnalyticsController };

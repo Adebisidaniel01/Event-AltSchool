@@ -13,8 +13,12 @@ export const AuthService = {
     const user = await User.findOne({ email });
     if (!user) throw new Error("Invalid credentials");
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) throw new Error("Invalid credentials");
+    if (!user.password) {
+  throw new Error("User password not found");
+}
+
+const match = await bcrypt.compare(password, user.password);
+
 
     const accessToken = jwt.sign(
       { id: user.id, role: user.role },
