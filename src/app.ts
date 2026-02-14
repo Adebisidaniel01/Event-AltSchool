@@ -37,3 +37,9 @@ app.use(errorMiddleware);
 app.get("/", (req, res) => {
   res.send("Eventful API is running");
 });
+
+
+
+app.use(cors({
+  origin: "https://eventful-altschool.onrender.com"
+}));
