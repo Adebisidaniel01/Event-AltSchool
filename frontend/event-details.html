@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event Details - Eventful</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">🎉 Eventful</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="events.html">Events</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div id="alertContainer"></div>
+
+    <div id="eventContainer" class="card">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <footer style="background: var(--dark); color: white; padding: 2rem; text-align: center; margin-top: 4rem;">
+    <p>&copy; 2026 Eventful. All rights reserved.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    // Fetch all events and find by id (API doesn't provide single-event endpoint)
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    async function loadEvent() {
+      const container = document.getElementById('eventContainer');
+      try {
+        const res = await fetch('http://localhost:5001/api/events');
+        const events = await res.json();
+        const event = events.find(e => e._id === id);
+        if (!event) {
+          container.innerHTML = '<p>Event not found</p>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="event-image-placeholder">🎪</div>
+          <div class="event-info">
+            <h2 class="event-title">${event.title}</h2>
+            <div class="event-date">📅 ${new Date(event.date).toLocaleString()}</div>
+            <p class="text-muted mt-2">${event.description || 'No description provided.'}</p>
+            <div class="event-price mt-2">Price: ₦${event.price?.toLocaleString() || 'Free'}</div>
+            <div style="margin-top:1.5rem;">
+              <button class="btn btn-primary" id="buyBtn">Buy Ticket</button>
+            </div>
+          </div>
+        `;
+
+        document.getElementById('buyBtn').addEventListener('click', buyTicket);
+      } catch (err) {
+        console.error(err);
+        showAlert('Failed to load event', 'error');
+      }
+    }
+
+    async function buyTicket() {
+      try {
+        const res = await authFetch('http://localhost:5001/api/tickets/buy', {
+          method: 'POST',
+          body: JSON.stringify({ eventId: id })
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          showAlert(data.message || 'Purchase failed', 'error');
+          return;
+        }
+
+        showAlert('Ticket purchased successfully!', 'success');
+      } catch (err) {
+        console.error(err);
+        showAlert('You must be logged in to buy tickets', 'error');
+        setTimeout(() => window.location.href = 'login.html', 1000);
+      }
+    }
+
+    loadEvent();
+  </script>
+</body>
+</html>

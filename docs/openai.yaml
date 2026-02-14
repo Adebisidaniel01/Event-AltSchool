@@ -1,0 +1,68 @@
+openapi: 3.0.0
+info:
+  title: Eventful API
+  version: 1.0.0
+paths:
+  /api/auth/login:
+    post:
+      summary: Login user
+  /api/events:
+    get:
+      summary: List events
+    post:
+      summary: Create event (creator only)
+
+---
+
+# 3️⃣ Swagger / OpenAPI
+
+### `docs/openapi.yaml`
+
+```yaml
+openapi: 3.0.0
+info:
+  title: Eventful API
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api
+paths:
+  /auth/register:
+    post:
+      summary: Register user
+      requestBody:
+        required: true
+      responses:
+        '201':
+          description: User created
+  /auth/login:
+    post:
+      summary: Login user
+  /auth/refresh:
+    post:
+      summary: Refresh access token
+  /events:
+    get:
+      summary: List all events
+    post:
+      summary: Create event (creator only)
+  /tickets/buy:
+    post:
+      summary: Buy ticket
+  /qr/scan:
+    post:
+      summary: Scan ticket QR (creator only)
+  /payments/initialize:
+    post:
+      summary: Initialize payment
+  /payments/webhook:
+    post:
+      summary: Paystack webhook
+  /notifications:
+    post:
+      summary: Create notification
+  /analytics:
+    get:
+      summary: Global analytics (creator only)
+  /analytics/events:
+    get:
+      summary: Event-specific analytics (creator only)

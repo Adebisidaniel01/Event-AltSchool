@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.analyticsRoutes = void 0;
+const express_1 = require("express");
+const analytics_controller_1 = require("./analytics.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const role_middleware_1 = require("../../middlewares/role.middleware");
+exports.analyticsRoutes = (0, express_1.Router)();
+exports.analyticsRoutes.get("/", auth_middleware_1.authenticate, (0, role_middleware_1.authorize)("CREATOR"), analytics_controller_1.AnalyticsController.overview);
+exports.analyticsRoutes.get("/events", auth_middleware_1.authenticate, (0, role_middleware_1.authorize)("CREATOR"), analytics_controller_1.AnalyticsController.byEvent);

@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.eventRoutes = void 0;
+const express_1 = require("express");
+const event_controller_1 = require("./event.controller");
+const auth_middleware_1 = require("../../middlewares/auth.middleware");
+const role_middleware_1 = require("../../middlewares/role.middleware");
+exports.eventRoutes = (0, express_1.Router)();
+exports.eventRoutes.get("/", event_controller_1.EventController.list);
+exports.eventRoutes.post("/", auth_middleware_1.authenticate, (0, role_middleware_1.authorize)("CREATOR"), event_controller_1.EventController.create);

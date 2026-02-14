@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QR Scanner - Eventful</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">🎉 Eventful</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="dashboard.html">Dashboard</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div id="alertContainer"></div>
+
+    <div class="card scanner-container">
+      <h3>Scan Ticket QR</h3>
+      <p class="text-muted">Paste the QR token or scan (camera not implemented here).</p>
+      <input id="qrToken" placeholder="paste qr token here" />
+      <div style="width:100%; display:flex; gap:1rem;">
+        <button class="btn btn-primary" id="scanBtn">Verify</button>
+        <button class="btn btn-outline" id="clearBtn">Clear</button>
+      </div>
+
+      <div id="scanResult" style="width:100%; margin-top:1rem;"></div>
+    </div>
+  </div>
+
+  <footer style="background: var(--dark); color: white; padding: 2rem; text-align: center; margin-top: 4rem;">
+    <p>&copy; 2026 Eventful. All rights reserved.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.getElementById('scanBtn').addEventListener('click', async () => {
+      const token = document.getElementById('qrToken').value.trim();
+      if (!token) return showAlert('Please provide a QR token', 'warning');
+
+      try {
+        const res = await authFetch('http://localhost:5001/api/qr/scan', {
+          method: 'POST',
+          body: JSON.stringify({ qrToken: token })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showAlert(data.message || 'Invalid QR', 'error');
+          return;
+        }
+
+        document.getElementById('scanResult').innerHTML = `<div class="alert alert-success">Access granted to event: <strong>${data.event?.title || 'Unknown'}</strong></div>`;
+      } catch (err) {
+        console.error(err);
+        showAlert('Verification failed. Are you logged in?', 'error');
+      }
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      document.getElementById('qrToken').value = '';
+      document.getElementById('scanResult').innerHTML = '';
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creator Dashboard - Eventful</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <div class="logo">🎉 Eventful</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="dashboard.html" style="color: var(--primary);">Dashboard</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div id="alertContainer"></div>
+
+    <h1 style="margin-bottom: 1rem;">Creator Dashboard</h1>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-button active" data-tab="overview">Overview</button>
+        <button class="tab-button" data-tab="events">My Events</button>
+      </div>
+
+      <div id="overview" class="tab-content active">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-value" id="totalTickets">—</div>
+            <div class="stat-label">Total Tickets</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="scannedTickets">—</div>
+            <div class="stat-label">Scanned Tickets</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Event-level Analytics</h3>
+          <div id="eventsAnalytics"></div>
+        </div>
+      </div>
+
+      <div id="events" class="tab-content">
+        <h3>My Events</h3>
+        <div id="myEventsList"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer style="background: var(--dark); color: white; padding: 2rem; text-align: center; margin-top: 4rem;">
+    <p>&copy; 2026 Eventful. All rights reserved.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    requireAuth();
+    requireCreator();
+
+    // Tabs
+    document.querySelectorAll('.tab-button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+      });
+    });
+
+    async function loadOverview() {
+      try {
+        const res = await authFetch('http://localhost:5001/api/analytics');
+        const data = await res.json();
+        document.getElementById('totalTickets').textContent = data.totalTickets;
+        document.getElementById('scannedTickets').textContent = data.scanned;
+      } catch (err) {
+        console.error(err);
+        showAlert('Failed to load analytics', 'error');
+      }
+    }
+
+    async function loadByEvent() {
+      try {
+        const res = await authFetch('http://localhost:5001/api/analytics/events');
+        const data = await res.json();
+        const c = document.getElementById('eventsAnalytics');
+        c.innerHTML = data.map(d => `
+          <div class="card" style="margin-bottom:1rem;">
+            <h4>${d.event}</h4>
+            <p>Tickets: ${d.tickets} — Scanned: ${d.scanned}</p>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error(err);
+        showAlert('Failed to load event analytics', 'error');
+      }
+    }
+
+    async function loadMyEvents() {
+      try {
+        const res = await authFetch('http://localhost:5001/api/events');
+        const events = await res.json();
+        // Filter by creator from token
+        const token = localStorage.getItem('accessToken');
+        const payload = token ? parseJwt(token) : null;
+        const myEvents = events.filter(e => e.creator && payload && e.creator._id === payload.id);
+        const list = document.getElementById('myEventsList');
+        if (myEvents.length === 0) list.innerHTML = '<p class="text-muted">You have not created any events yet.</p>';
+        else list.innerHTML = myEvents.map(ev => `<div class="card" style="margin-bottom:1rem;"><strong>${ev.title}</strong><p>${new Date(ev.date).toLocaleString()}</p></div>`).join('');
+      } catch (err) {
+        console.error(err);
+        showAlert('Failed to load your events', 'error');
+      }
+    }
+
+    loadOverview();
+    loadByEvent();
+    loadMyEvents();
+  </script>
+</body>
+</html>

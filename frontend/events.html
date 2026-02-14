@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Events - Eventful</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header>
+    <nav>
+      <div class="logo">🎉 Eventful</div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="events.html" style="color: var(--primary);">Events</a></li>
+        <li id="userMenuContainer" class="hidden">
+          <a href="dashboard.html">Dashboard</a>
+        </li>
+        <li id="logoutContainer" class="hidden">
+          <button class="logout-btn" onClick="logout()">Logout</button>
+        </li>
+        <li id="authLinks">
+          <a href="login.html" style="margin-right: 1rem;">Login</a>
+          <a href="register.html" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Sign Up</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    <h1 style="margin-bottom: 2rem;">Upcoming Events</h1>
+
+    <!-- Search & Filter -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <div class="grid grid-2">
+        <div>
+          <label for="searchInput">Search Events</label>
+          <input type="text" id="searchInput" placeholder="Event name...">
+        </div>
+        <div>
+          <label for="sortInput">Sort By</label>
+          <select id="sortInput">
+            <option value="newest">Newest</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    <div id="alertContainer"></div>
+
+    <!-- Events Grid -->
+    <div class="grid grid-3" id="eventsGrid">
+      <div class="spinner"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer style="background: var(--dark); color: white; padding: 2rem; text-align: center; margin-top: 4rem;">
+    <p>&copy; 2026 Eventful. All rights reserved.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let allEvents = [];
+
+    async function loadEvents() {
+      try {
+        const response = await fetch('http://localhost:5001/api/events');
+        const events = await response.json();
+        allEvents = events;
+        renderEvents(events);
+      } catch (error) {
+        console.error('Error loading events:', error);
+        showAlert('Failed to load events', 'error');
+      }
+    }
+
+    function renderEvents(events) {
+      const grid = document.getElementById('eventsGrid');
+      
+      if (events.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #6b7280;">No events found</p>';
+        return;
+      }
+
+      grid.innerHTML = events.map(event => `
+        <div class="card event-card" onclick="goToEvent('${event._id}')">
+          <div class="event-image-placeholder">🎪</div>
+          <div class="event-info">
+            <div class="event-title">${event.title}</div>
+            <div class="event-date">📅 ${new Date(event.date).toLocaleDateString()}</div>
+            <div class="event-price">₦${event.price?.toLocaleString() || 'Free'}</div>
+            <button class="btn btn-primary btn-block" style="margin-top: 1rem;">View Details</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function goToEvent(eventId) {
+      window.location.href = `event-details.html?id=${eventId}`;
+    }
+
+    // Search
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      const search = e.target.value.toLowerCase();
+      const filtered = allEvents.filter(event => 
+        event.title.toLowerCase().includes(search)
+      );
+      renderEvents(filtered);
+    });
+
+    // Sort
+    document.getElementById('sortInput').addEventListener('change', (e) => {
+      let sorted = [...allEvents];
+      if (e.target.value === 'price-low') {
+        sorted.sort((a, b) => a.price - b.price);
+      } else if (e.target.value === 'price-high') {
+        sorted.sort((a, b) => b.price - a.price);
+      } else {
+        sorted.sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
+      renderEvents(sorted);
+    });
+
+    // Load events on page load
+    loadEvents();
+  </script>
+</body>
+</html>

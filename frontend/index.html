@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eventful - Discover Amazing Events</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <header>
+    <nav>
+      <div class="logo">🎉 Eventful</div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="login.html" id="loginLink">Login</a></li>
+        <li><a href="register.html" id="registerLink">Sign Up</a></li>
+        <li id="userMenuContainer" class="hidden">
+          <a href="dashboard.html" id="dashboardLink">Dashboard</a>
+        </li>
+        <li id="logoutContainer" class="hidden">
+          <button class="logout-btn" onClick="logout()">Logout</button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <h1>Discover Amazing Events</h1>
+    <p>Book tickets for concerts, conferences, and more</p>
+    <a href="events.html" class="btn btn-primary" style="display: inline-block;">Explore Events</a>
+  </section>
+
+  <!-- Main Content -->
+  <div class="container">
+    <!-- Alerts -->
+    <div id="alertContainer"></div>
+
+    <!-- Featured Events -->
+    <section>
+      <h2 style="margin-bottom: 2rem;">Featured Events</h2>
+      <div class="grid grid-3" id="featuredEventsGrid">
+        <div class="spinner"></div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section style="margin-top: 4rem; margin-bottom: 4rem;">
+      <h2 style="text-align: center; margin-bottom: 3rem;">How It Works</h2>
+      <div class="grid grid-3">
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+          <h3>Discover</h3>
+          <p>Browse thousands of events happening near you</p>
+        </div>
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🎫</div>
+          <h3>Book Tickets</h3>
+          <p>Secure your spot with our easy booking system</p>
+        </div>
+        <div class="card text-center">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+          <h3>Enjoy</h3>
+          <p>Show your QR code at the venue. You're in!</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer style="background: var(--dark); color: white; padding: 2rem; text-align: center; margin-top: 4rem;">
+    <p>&copy; 2026 Eventful. All rights reserved.</p>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
