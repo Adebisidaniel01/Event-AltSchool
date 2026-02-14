@@ -33,3 +33,6 @@ exports.app.use((0, express_rate_limit_1.default)({
 }));
 exports.app.use("/api", routes_1.routes);
 exports.app.use(error_middleware_1.errorMiddleware);
+exports.app.get("/", (req, res) => {
+    res.send("Eventful API is running");
+});

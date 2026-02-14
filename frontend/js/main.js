@@ -5,7 +5,7 @@ async function loadFeaturedEvents(limit = 6) {
   if (!grid) return;
 
   try {
-    const res = await fetch('http://localhost:5001/api/events');
+    const res = await fetch("https://event-altschool-3.onrender.com/api/events");
     const events = await res.json();
     const featured = events.slice(0, limit);
 
